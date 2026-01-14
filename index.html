@@ -17,7 +17,7 @@
             --text: #ffffff; 
             --text-sec: #b3b3b3;
             --card-bg: #1c1c24; 
-            --glass-bg: rgba(28, 28, 36, 0.9);
+            --glass-bg: rgba(28, 28, 36, 0.95);
             --border: rgba(255, 255, 255, 0.08);
         }
         
@@ -64,7 +64,6 @@
         .menu-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); backdrop-filter: blur(3px); z-index: 2000; opacity: 0; visibility: hidden; transition: 0.3s; }
         .menu-overlay.open { opacity: 1; visibility: visible; }
         .menu-header { padding: 40px 20px; background: var(--primary-gradient); color: #fff; font-size: 22px; font-weight: 700; display: flex; align-items: center; gap: 10px; }
-        .menu-list { list-style: none; padding: 10px 0; }
         .menu-item { display: flex; align-items: center; gap: 15px; padding: 15px 25px; font-size: 15px; color: var(--text); text-decoration: none; font-weight: 500; border-bottom: 1px solid var(--border); transition: 0.2s; }
 
         /* SEARCH & AD */
@@ -114,17 +113,23 @@
         .bar:nth-child(4) { height: 50%; animation-duration: 0.55s; }
         @keyframes equalize { 0% { transform: scaleY(0.3); } 50% { transform: scaleY(1); } 100% { transform: scaleY(0.3); } }
 
-        /* PLAYER */
+        /* --- FIXED PLAYER (Initially Hidden) --- */
         .music-player { 
-            position: fixed; bottom: 85px; left: 50%; transform: translateX(-50%) translateY(150%); 
+            position: fixed; bottom: 85px; left: 50%; 
+            transform: translateX(-50%) translateY(200%); /* Moved far down */
             width: 92%; max-width: 450px; 
             background: rgba(26, 26, 30, 0.95); backdrop-filter: blur(20px); 
             border-radius: 20px; padding: 15px 20px; z-index: 1000; 
             box-shadow: 0 20px 50px rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.1); 
-            transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1); 
+            transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1); 
             display: flex; flex-direction: column; gap: 12px; 
+            opacity: 0; visibility: hidden; /* Completely invisible */
         }
-        .music-player.visible { transform: translateX(-50%) translateY(0); }
+        .music-player.visible { 
+            transform: translateX(-50%) translateY(0); 
+            opacity: 1; visibility: visible; 
+        }
+
         .player-top { display: flex; align-items: center; justify-content: space-between; gap: 15px; }
         .player-thumb-box { width: 50px; height: 50px; flex-shrink: 0; }
         .player-thumb { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; animation: rotate 10s linear infinite; animation-play-state: paused; border: 2px solid rgba(255,255,255,0.1); }
@@ -329,7 +334,7 @@
             }).catch(() => alert("Upload Failed"));
         }
 
-        // --- GLOBAL LOADER (ARCHIVE) ---
+        // --- GLOBAL LOADER ---
         async function loadGlobalMusic() {
             globalPlaylist = [];
             let songCounter = 0;
@@ -345,7 +350,6 @@
                     if(data.files) {
                         let server = `https://${data.d1}${data.dir}/`;
                         let thumb = "https://via.placeholder.com/100/8A2BE2/ffffff?text=Global";
-                        // Find thumb
                         for(let f of data.files) {
                             if(f.format === "JPEG" || f.format === "PNG" || f.format === "Thumbnail") {
                                 thumb = server + f.name;
@@ -363,7 +367,7 @@
                                     title: title,
                                     link: link,
                                     thumb: thumb,
-                                    artist: "Global" // Requested Artist Name
+                                    artist: "Global"
                                 });
                             }
                         });
@@ -373,7 +377,7 @@
 
             document.getElementById('loadingGlobal').style.display = 'none';
             container.innerHTML = "";
-            currentActiveList = globalPlaylist; // Default
+            currentActiveList = globalPlaylist; 
 
             globalPlaylist.forEach(track => {
                 let div = document.createElement('div');
@@ -394,7 +398,7 @@
             });
         }
 
-        // --- HOME LOADER (SHEET) ---
+        // --- HOME LOADER ---
         async function loadHomeMusic() {
             homePlaylist = [];
             let songCounter = 0;
@@ -454,7 +458,13 @@
             document.getElementById('playerThumb').src = track.thumb;
             
             document.querySelectorAll('.song-item').forEach(el => el.classList.remove('active'));
-            // Highlight specific item logic can be added here if needed
+            // Smart Highlighting
+            const allItems = document.querySelectorAll('.song-item');
+            if(tab === currentTab) {
+               // Find item visually
+               let visibleIndex = currentActiveList.findIndex(t => t.id === track.id);
+               if(allItems[visibleIndex]) allItems[visibleIndex].classList.add('active');
+            }
             
             audio.src = track.link;
             audio.play();
@@ -467,8 +477,8 @@
             else { audio.pause(); document.getElementById('playIcon').innerText = "play_arrow"; document.getElementById('playerThumb').classList.remove('playing'); }
         }
 
-        function nextSong() { currentIndex < currentActiveList.length - 1 ? playSong(currentActiveList[currentIndex + 1]) : playSong(currentActiveList[0]); }
-        function prevSong() { currentIndex > 0 ? playSong(currentActiveList[currentIndex - 1]) : null; }
+        function nextSong() { currentIndex < currentActiveList.length - 1 ? playSong(currentActiveList[currentIndex + 1], currentTab) : playSong(currentActiveList[0], currentTab); }
+        function prevSong() { currentIndex > 0 ? playSong(currentActiveList[currentIndex - 1], currentTab) : null; }
 
         audio.ontimeupdate = () => { if(audio.duration) document.getElementById('progFill').style.width = (audio.currentTime / audio.duration) * 100 + "%"; };
         document.getElementById('progArea').onclick = (e) => { let w = e.currentTarget.clientWidth; audio.currentTime = (e.offsetX / w) * audio.duration; }
