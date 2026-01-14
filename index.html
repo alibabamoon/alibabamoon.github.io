@@ -9,21 +9,35 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
     <style>
-        /* --- MODERN DARK THEME --- */
+        /* --- THEME --- */
         :root { 
-            --primary: #8A2BE2; /* Vivid Purple */
+            --primary: #8A2BE2; 
             --primary-gradient: linear-gradient(135deg, #8A2BE2, #FF0080);
             --bg: #0f0e13; 
             --text: #ffffff; 
             --text-sec: #b3b3b3;
             --card-bg: #1c1c24; 
-            --glass-bg: rgba(28, 28, 36, 0.85);
+            --glass-bg: rgba(28, 28, 36, 0.9);
             --border: rgba(255, 255, 255, 0.08);
         }
         
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; -webkit-tap-highlight-color: transparent; }
-        body { background: var(--bg); color: var(--text); overflow-x: hidden; min-height: 100vh; padding-bottom: 160px; }
+        body { background: var(--bg); color: var(--text); overflow-x: hidden; min-height: 100vh; padding-bottom: 160px; position: relative; }
         img { max-width: 100%; display: block; }
+
+        /* 🔥 BLUR ANIMATION 🔥 */
+        .bg-blob {
+            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            width: 350px; height: 350px;
+            background: var(--primary-gradient);
+            filter: blur(120px); opacity: 0.25;
+            border-radius: 50%; z-index: -1;
+            animation: moveBlob 15s infinite alternate ease-in-out;
+        }
+        @keyframes moveBlob {
+            0% { transform: translate(-50%, -50%) scale(1); }
+            100% { transform: translate(-50%, -70%) scale(0.9); }
+        }
 
         /* HEADER */
         header { 
@@ -41,10 +55,8 @@
             background: var(--primary-gradient); color: #fff; padding: 8px 16px; 
             border-radius: 50px; font-size: 13px; font-weight: 600; cursor: pointer;
             display: flex; align-items: center; gap: 6px; 
-            box-shadow: 0 4px 15px rgba(138, 43, 226, 0.4); transition: 0.2s;
-            border: none;
+            box-shadow: 0 4px 15px rgba(138, 43, 226, 0.4); transition: 0.2s; border: none;
         }
-        .upload-btn:active { transform: scale(0.96); }
 
         /* SIDE MENU */
         .side-menu { position: fixed; top: 0; left: 0; width: 280px; height: 100%; background: var(--card-bg); z-index: 2001; transform: translateX(-100%); transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 5px 0 25px rgba(0,0,0,0.5); display: flex; flex-direction: column; border-right: 1px solid var(--border); }
@@ -54,57 +66,39 @@
         .menu-header { padding: 40px 20px; background: var(--primary-gradient); color: #fff; font-size: 22px; font-weight: 700; display: flex; align-items: center; gap: 10px; }
         .menu-list { list-style: none; padding: 10px 0; }
         .menu-item { display: flex; align-items: center; gap: 15px; padding: 15px 25px; font-size: 15px; color: var(--text); text-decoration: none; font-weight: 500; border-bottom: 1px solid var(--border); transition: 0.2s; }
-        .menu-item:active { background: rgba(255,255,255,0.05); }
-        .menu-item i { color: #b3b3b3; }
 
-        /* SEARCH */
-        .search-area { padding: 20px; }
+        /* SEARCH & AD */
+        .search-area { padding: 20px 20px 10px 20px; }
         .search-box { 
             background: var(--card-bg); border-radius: 12px; display: flex; align-items: center; 
-            padding: 0 15px; height: 50px; border: 1px solid var(--border);
-            transition: 0.3s;
+            padding: 0 15px; height: 50px; border: 1px solid var(--border); transition: 0.3s;
         }
-        .search-box:focus-within { border-color: var(--primary); box-shadow: 0 0 15px rgba(138, 43, 226, 0.2); }
         .search-box input { flex: 1; background: transparent; border: none; outline: none; margin-left: 10px; font-size: 15px; color: #fff; }
-
-        /* ADSTERRA BANNER AREA */
+        
         .ad-container {
-            width: 100%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin-bottom: 20px;
-            min-height: 50px;
-            overflow: hidden;
-            background: rgba(255,255,255,0.02);
-            border-radius: 10px;
-            padding: 10px;
+            width: 100%; display: flex; justify-content: center; align-items: center;
+            margin-bottom: 10px; min-height: 50px; overflow: hidden;
+            border-radius: 10px; padding: 5px;
         }
 
-        /* LIST */
-        .song-list { padding: 0 20px; }
-        .section-title { font-size: 13px; font-weight: 700; color: var(--primary); margin-bottom: 15px; text-transform: uppercase; letter-spacing: 1.5px; opacity: 0.8; }
-        
+        /* TAB VIEWS */
+        .view-section { display: none; padding: 0 20px; animation: fadeIn 0.4s ease; }
+        .view-section.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .section-title { font-size: 13px; font-weight: 700; color: var(--primary); margin-bottom: 15px; text-transform: uppercase; letter-spacing: 1.5px; opacity: 0.8; margin-top: 10px; }
+
+        /* SONG ITEM */
         .song-item {
             display: flex; align-items: center; justify-content: space-between;
             background: var(--card-bg); padding: 12px; border-radius: 16px; margin-bottom: 12px; 
             border: 1px solid transparent; cursor: pointer; transition: all 0.25s ease;
             position: relative; overflow: hidden;
         }
-        
-        .song-item:active { transform: scale(0.98); }
-
-        /* Modern Active State */
-        .song-item.active {
-            background: rgba(138, 43, 226, 0.1);
-            border-color: var(--primary);
-            box-shadow: 0 4px 20px rgba(138, 43, 226, 0.15);
-        }
-
+        .song-item.active { background: rgba(138, 43, 226, 0.1); border-color: var(--primary); box-shadow: 0 4px 20px rgba(138, 43, 226, 0.15); }
         .song-left { display: flex; align-items: center; gap: 15px; overflow: hidden; flex: 1; }
         .song-id { font-size: 12px; color: #555; font-weight: 700; min-width: 30px; }
         .song-item.active .song-id { color: var(--primary); }
-        
         .song-thumb { width: 50px; height: 50px; border-radius: 10px; object-fit: cover; background: #333; }
         .song-info { display: flex; flex-direction: column; overflow: hidden; flex: 1; }
         .song-title { font-size: 15px; font-weight: 600; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 4px; }
@@ -120,70 +114,78 @@
         .bar:nth-child(4) { height: 50%; animation-duration: 0.55s; }
         @keyframes equalize { 0% { transform: scaleY(0.3); } 50% { transform: scaleY(1); } 100% { transform: scaleY(0.3); } }
 
-        /* SCROLL LOADER */
-        .scroll-loader { text-align: center; padding: 20px; color: #666; font-size: 12px; display: none; }
-
-        /* PLAYER & MODAL */
+        /* PLAYER */
         .music-player { 
-            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%) translateY(150%); 
+            position: fixed; bottom: 85px; left: 50%; transform: translateX(-50%) translateY(150%); 
             width: 92%; max-width: 450px; 
-            background: rgba(26, 26, 30, 0.85); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            background: rgba(26, 26, 30, 0.95); backdrop-filter: blur(20px); 
             border-radius: 20px; padding: 15px 20px; z-index: 1000; 
             box-shadow: 0 20px 50px rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.1); 
             transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1); 
             display: flex; flex-direction: column; gap: 12px; 
         }
         .music-player.visible { transform: translateX(-50%) translateY(0); }
-        
         .player-top { display: flex; align-items: center; justify-content: space-between; gap: 15px; }
-        .player-thumb-box { position: relative; width: 50px; height: 50px; flex-shrink: 0; }
-        .player-thumb { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; border: 2px solid rgba(255,255,255,0.1); animation: rotate 10s linear infinite; animation-play-state: paused; }
+        .player-thumb-box { width: 50px; height: 50px; flex-shrink: 0; }
+        .player-thumb { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; animation: rotate 10s linear infinite; animation-play-state: paused; border: 2px solid rgba(255,255,255,0.1); }
         .player-thumb.playing { animation-play-state: running; }
         @keyframes rotate { 100% { transform: rotate(360deg); } }
-        
         .player-info { flex: 1; overflow: hidden; }
-        .p-title { font-size: 14px; font-weight: 700; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .p-artist { font-size: 11px; color: #aaa; margin-top: 2px; }
-        
+        .p-title { font-size: 14px; font-weight: 700; color: #fff; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .p-artist { font-size: 11px; color: #aaa; }
         .player-controls { display: flex; align-items: center; gap: 18px; }
-        .ctrl-btn { color: #fff; font-size: 26px; cursor: pointer; opacity: 0.8; transition: 0.2s; }
-        .ctrl-btn:active { transform: scale(0.8); }
-        .play-btn { width: 42px; height: 42px; background: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #000; font-size: 24px; cursor: pointer; box-shadow: 0 4px 15px rgba(255,255,255,0.2); }
-        
+        .ctrl-btn { color: #fff; font-size: 26px; cursor: pointer; }
+        .play-btn { width: 42px; height: 42px; background: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #000; cursor: pointer; }
         .progress-area { width: 100%; cursor: pointer; padding: 8px 0; }
-        .progress-bg { width: 100%; height: 4px; background: rgba(255,255,255,0.1); border-radius: 10px; position: relative; overflow: hidden; }
+        .progress-bg { width: 100%; height: 4px; background: rgba(255,255,255,0.1); border-radius: 10px; }
         .progress-fill { height: 100%; background: var(--primary-gradient); width: 0%; border-radius: 10px; }
 
+        /* BOTTOM NAV */
+        .bottom-nav {
+            position: fixed; bottom: 0; left: 0; width: 100%; height: 75px;
+            background: #15151a; border-top: 1px solid var(--border);
+            display: flex; justify-content: space-around; align-items: center;
+            z-index: 900; padding-bottom: 10px;
+        }
+        .nav-item {
+            display: flex; flex-direction: column; align-items: center; gap: 5px;
+            color: #666; font-size: 11px; font-weight: 500;
+            background: none; border: none; cursor: pointer; width: 50%; transition: 0.3s;
+        }
+        .nav-item i { font-size: 24px; transition: 0.3s; }
+        .nav-item.active { color: var(--primary); }
+        .nav-item.active i { transform: translateY(-3px); text-shadow: 0 5px 15px rgba(138, 43, 226, 0.5); }
+
+        /* MODAL */
         .upload-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 2000; display: none; align-items: center; justify-content: center; backdrop-filter: blur(8px); }
-        .modal-box { background: #1c1c24; width: 90%; max-width: 380px; border-radius: 20px; padding: 30px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); position: relative; border: 1px solid var(--border); }
+        .modal-box { background: #1c1c24; width: 90%; max-width: 380px; border-radius: 20px; padding: 30px; border: 1px solid var(--border); position: relative; }
         .close-btn { position: absolute; top: 20px; right: 20px; font-size: 24px; color: #666; cursor: pointer; }
         .input-group label { color: #aaa; font-size: 12px; margin-bottom: 5px; display: block; }
-        .input-group input { width: 100%; padding: 12px; background: #121217; border: 1px solid var(--border); color: #fff; border-radius: 10px; margin-bottom: 15px; outline: none; transition: 0.3s; }
-        .input-group input:focus { border-color: var(--primary); }
-        .submit-btn { width: 100%; background: var(--primary-gradient); color: #fff; padding: 14px; border: none; border-radius: 12px; font-weight: 700; cursor: pointer; margin-top: 10px; }
+        .input-group input { width: 100%; padding: 12px; background: #121217; border: 1px solid var(--border); color: #fff; border-radius: 10px; margin-bottom: 15px; outline: none; }
+        .submit-btn { width: 100%; background: var(--primary-gradient); color: #fff; padding: 14px; border: none; border-radius: 12px; font-weight: 700; cursor: pointer; }
 
-        @media(min-width: 768px) { body { max-width: 480px; margin: 0 auto; border-left: 1px solid #333; border-right: 1px solid #333; } }
+        @media(min-width: 768px) { body { max-width: 480px; margin: 0 auto; border-left: 1px solid #333; border-right: 1px solid #333; } .bottom-nav { max-width: 480px; left: 50%; transform: translateX(-50%); } }
     </style>
 </head>
 <body>
+    
+    <div class="bg-blob"></div>
 
     <div class="menu-overlay" onclick="toggleMenu()"></div>
+    
     <div class="side-menu" id="sideMenu">
         <div class="menu-header"><i class="material-icons">album</i> Alibaba Moon</div>
         <div class="menu-list">
-            <a href="https://alibabamoon.github.io/Versions" class="menu-item"><i class="material-icons">history</i> Versions</a>
-            <a href="https://alibabamoon.github.io/Upload" class="menu-item"><i class="material-icons">cloud_upload</i> Upload</a>
-            <a href="https://alibabamoon.github.io/Edit%20Request" class="menu-item"><i class="material-icons">edit</i> Edit Request</a>
-            <a href="https://alibabamoon.github.io/Report" class="menu-item"><i class="material-icons">flag</i> Report</a>
-            <a href="https://alibabamoon.github.io/Newsfeed" class="menu-item"><i class="material-icons">feed</i> Newsfeed</a>
-            <a href="https://alibabamoon.github.io/Help" class="menu-item"><i class="material-icons">help_outline</i> Help</a>
+            <a href="#" class="menu-item"><i class="material-icons">history</i> Versions</a>
+            <a href="#" class="menu-item"><i class="material-icons">cloud_upload</i> Upload</a>
+            <a href="#" class="menu-item"><i class="material-icons">help_outline</i> Help</a>
         </div>
     </div>
 
     <header>
         <div class="logo-area" onclick="toggleMenu()">
             <i class="material-icons" id="menuTriggerIcon" style="color:#fff;">menu</i>
-            <span class="logo-text">Alibaba</span>
+            <span class="logo-text">Alibaba Moon</span>
         </div>
         <div class="upload-btn" onclick="openUpload()">
             <i class="material-icons" style="font-size:16px;">cloud_upload</i> Upload
@@ -197,31 +199,37 @@
         </div>
     </div>
 
-        <div class="ad-container">
+    <div class="ad-container">
         <script type="text/javascript">
             atOptions = {
-                'key' : '384c45ceae16e415e012c9ef9322c5bb',
+                'key' : '28342205', 
                 'format' : 'iframe',
-                'height' : 70,
+                'height' : 50,
                 'width' : 320,
                 'params' : {}
             };
         </script>
-        <script type="text/javascript" src="https://www.highperformanceformat.com/384c45ceae16e415e012c9ef9322c5bb/invoke.js"></script>
-        </div>
-    
-
-
-
-    <div class="song-list">
-        <div class="section-title">Random Mix</div>
-        <div id="loading" style="text-align:center; padding:50px; color:#555;">
-            <i class="fas fa-spinner fa-spin" style="font-size:24px; margin-bottom:10px;"></i><br>Mixing Tracks...
-        </div>
-        <div id="songContainer"></div>
-        <div id="scrollLoader" class="scroll-loader"><i class="fas fa-circle-notch fa-spin"></i> Loading more...</div>
-        <div id="noResult" style="display:none; text-align:center; padding:20px; color:#666;">No results found.</div>
+        <script type="text/javascript" src="https://www.highperformanceformat.com/28342205/invoke.js"></script>
+        <span style="color:#555; font-size:10px;">ADVERTISEMENT</span>
     </div>
+
+    <div id="globalView" class="view-section active">
+        <div class="section-title">Global Hits</div>
+        <div id="loadingGlobal" style="text-align:center; padding:30px; color:#555;">
+            <i class="fas fa-spinner fa-spin"></i> Fetching Global...
+        </div>
+        <div id="globalContainer"></div>
+    </div>
+
+    <div id="homeView" class="view-section">
+        <div class="section-title">My Collection</div>
+        <div id="loadingHome" style="text-align:center; padding:30px; color:#555;">
+            <i class="fas fa-spinner fa-spin"></i> Fetching Library...
+        </div>
+        <div id="homeContainer"></div>
+    </div>
+
+    <div id="noResult" style="display:none; text-align:center; padding:20px; color:#666;">No results found.</div>
 
     <div class="music-player" id="musicPlayer">
         <div class="player-top">
@@ -242,6 +250,17 @@
         <audio id="audioElement" preload="auto"></audio>
     </div>
 
+    <nav class="bottom-nav">
+        <button class="nav-item active" onclick="switchTab('global')" id="btnGlobal">
+            <i class="material-icons">public</i>
+            <span>Global</span>
+        </button>
+        <button class="nav-item" onclick="switchTab('home')" id="btnHome">
+            <i class="material-icons">home</i>
+            <span>Home</span>
+        </button>
+    </nav>
+
     <div class="upload-modal" id="uploadModal">
         <div class="modal-box">
             <span class="close-btn" onclick="closeUpload()">&times;</span>
@@ -257,138 +276,185 @@
             <div id="successMsg" style="display:none; text-align:center; color:#00ff88; margin-top:15px; font-weight:600;">✅ Success! Reloading...</div>
         </div>
     </div>
-    <script>
+        <script>
         // CONFIG
         const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRsl6bPkGOsMlCAA-2X8B389vPa8DuHCqmTnnsZSjuhafAapfvLUEfNYbg2m01QcsC0IWNlIwtvkMn7/pub?output=csv";
         const FORM_ACTION = "https://docs.google.com/forms/d/e/1FAIpQLSeHCakTTgx8R6p3zO-Kiv6o5vbj9YJ4vWFEsooYbWlEx9Bveg/formResponse";
         const ENTRY_IDS = { title: "entry.1127806446", audio: "entry.951478009", thumb: "entry.86259578", artist: "entry.1676226431" };
 
-        let fullPlaylist = [], currentDisplayList = [], currentIndex = -1, displayedCount = 0;
-        const LOAD_BATCH = 15;
+        const ARCHIVE_LINKS = [
+            "https://archive.org/details/KhwajaMereKhwaja_201604",
+            "https://archive.org/details/munni-badnam-hui-full-song-dabangg-lyrical-video-salman-khan-malaika-arora-khan"
+        ];
+
+        let globalPlaylist = [], homePlaylist = [], currentActiveList = [];
+        let currentIndex = -1, currentTab = 'global';
         const audio = document.getElementById('audioElement');
         
-        window.onload = loadSongs;
+        window.onload = () => {
+            loadGlobalMusic();
+            loadHomeMusic();
+        };
+
+        // --- TAB SWITCHING ---
+        function switchTab(tab) {
+            currentTab = tab;
+            document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+            
+            if(tab === 'global') {
+                document.getElementById('globalView').classList.add('active');
+                document.getElementById('btnGlobal').classList.add('active');
+                currentActiveList = globalPlaylist;
+            } else {
+                document.getElementById('homeView').classList.add('active');
+                document.getElementById('btnHome').classList.add('active');
+                currentActiveList = homePlaylist;
+            }
+        }
 
         function toggleMenu() {
             document.getElementById('sideMenu').classList.toggle('open');
             document.querySelector('.menu-overlay').classList.toggle('open');
-            document.getElementById('menuTriggerIcon').innerText = document.getElementById('sideMenu').classList.contains('open') ? "close" : "menu";
         }
-
         function openUpload() { document.getElementById('uploadModal').style.display = 'flex'; }
         function closeUpload() { document.getElementById('uploadModal').style.display = 'none'; }
         
         function handleFormSubmit(e) {
             e.preventDefault();
             const btn = document.getElementById('submitBtn'); btn.innerText = "Uploading..."; btn.disabled = true;
-            const fd = new FormData();
-            fd.append(ENTRY_IDS.title, document.getElementById('entryTitle').value);
-            fd.append(ENTRY_IDS.audio, document.getElementById('entryAudio').value);
-            fd.append(ENTRY_IDS.thumb, document.getElementById('entryThumb').value);
-            fd.append(ENTRY_IDS.artist, document.getElementById('entryArtist').value);
-            fetch(FORM_ACTION, { method: 'POST', mode: 'no-cors', body: fd }).then(() => {
+            fetch(FORM_ACTION, { method: 'POST', mode: 'no-cors', body: new FormData(e.target) }).then(() => {
                 document.getElementById('successMsg').style.display = 'block'; document.getElementById('musicForm').reset();
-                setTimeout(() => { closeUpload(); document.getElementById('successMsg').style.display = 'none'; btn.innerText = "Submit Song"; btn.disabled = false; loadSongs(); }, 2000);
+                setTimeout(() => { closeUpload(); document.getElementById('successMsg').style.display = 'none'; btn.innerText = "Submit Song"; btn.disabled = false; loadHomeMusic(); }, 2000);
             }).catch(() => alert("Upload Failed"));
         }
 
-        // --- RANDOM SHUFFLE LOGIC ---
-        function shuffleArray(array) {
-            for (let i = array.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [array[i], array[j]] = [array[j], array[i]];
+        // --- GLOBAL LOADER (ARCHIVE) ---
+        async function loadGlobalMusic() {
+            globalPlaylist = [];
+            let songCounter = 0;
+            const container = document.getElementById('globalContainer');
+
+            for (const link of ARCHIVE_LINKS) {
+                try {
+                    let archiveId = link.split('/details/')[1].split('/')[0];
+                    const metaUrl = `https://archive.org/metadata/${archiveId}`;
+                    const res = await fetch(metaUrl);
+                    const data = await res.json();
+                    
+                    if(data.files) {
+                        let server = `https://${data.d1}${data.dir}/`;
+                        let thumb = "https://via.placeholder.com/100/8A2BE2/ffffff?text=Global";
+                        // Find thumb
+                        for(let f of data.files) {
+                            if(f.format === "JPEG" || f.format === "PNG" || f.format === "Thumbnail") {
+                                thumb = server + f.name;
+                                break;
+                            }
+                        }
+
+                        data.files.forEach(file => {
+                            if(file.format === "VBR MP3" || file.name.endsWith(".mp3")) {
+                                let title = file.title || file.name.replace(".mp3", "").replace(/_/g, " ");
+                                let link = server + file.name;
+                                
+                                globalPlaylist.push({
+                                    id: "G" + String(songCounter++),
+                                    title: title,
+                                    link: link,
+                                    thumb: thumb,
+                                    artist: "Global" // Requested Artist Name
+                                });
+                            }
+                        });
+                    }
+                } catch(err) { console.log(err); }
             }
-            return array;
+
+            document.getElementById('loadingGlobal').style.display = 'none';
+            container.innerHTML = "";
+            currentActiveList = globalPlaylist; // Default
+
+            globalPlaylist.forEach(track => {
+                let div = document.createElement('div');
+                div.className = 'song-item';
+                div.onclick = () => playSong(track, 'global');
+                div.innerHTML = `
+                    <div class="song-left">
+                        <span class="song-id">GL</span>
+                        <img src="${track.thumb}" class="song-thumb">
+                        <div class="song-info">
+                            <div class="song-title">${track.title}</div>
+                            <div class="song-artist" style="color:#8A2BE2; font-weight:600;">Global</div>
+                        </div>
+                    </div>
+                    <div class="eq-icon"><div class="bar"></div><div class="bar"></div><div class="bar"></div></div>
+                `;
+                container.appendChild(div);
+            });
         }
 
-        async function loadSongs() {
+        // --- HOME LOADER (SHEET) ---
+        async function loadHomeMusic() {
+            homePlaylist = [];
+            let songCounter = 0;
+            const container = document.getElementById('homeContainer');
+            
             try {
                 const res = await fetch(CSV_URL);
                 const text = await res.text();
                 const rows = parseCSV(text);
-                fullPlaylist = [];
-
-                rows.forEach((col, i) => {
-                    if(i === 0 || col.length < 3 || !col[1]) return;
-                    let title = col[1].trim(); let link = col[2].trim(); let thumb = col[3].trim();
-                    let artist = col[4] ? col[4].trim() : "Unknown Artist";
-                    let id = String(i).padStart(3, '0');
-
-                    if(link.includes('dropbox.com')) link = link.replace('www.dropbox.com', 'dl.dropboxusercontent.com').replace('?dl=0', '');
-                    if(!thumb) thumb = "https://via.placeholder.com/100/7F5AF0/ffffff?text=Music";
-
-                    fullPlaylist.push({ id, title, link, thumb, artist });
-                });
-
-                // Apply Random Shuffle
-                fullPlaylist = shuffleArray(fullPlaylist);
-                currentDisplayList = [...fullPlaylist]; 
-
-                document.getElementById('songContainer').innerHTML = '';
-                displayedCount = 0;
-                document.getElementById('loading').style.display = 'none';
                 
-                loadMore();
+                for (let i = 0; i < rows.length; i++) {
+                    let col = rows[i];
+                    if(i === 0 || col.length < 3 || !col[1]) continue;
+                    let title = col[1].trim(); 
+                    let link = col[2].trim().replace('www.dropbox.com', 'dl.dropboxusercontent.com').replace('?dl=0', '');
+                    let thumb = col[3].trim() || "https://via.placeholder.com/100/8A2BE2/ffffff?text=Home";
+                    let artist = col[4] ? col[4].trim() : "Unknown Artist";
+                    
+                    homePlaylist.push({
+                        id: "H" + String(songCounter++),
+                        title: title, link: link, thumb: thumb, artist: artist
+                    });
+                }
+            } catch(e) {}
 
-            } catch(e) { console.log(e); }
-        }
+            document.getElementById('loadingHome').style.display = 'none';
+            container.innerHTML = "";
 
-        function loadMore() {
-            const container = document.getElementById('songContainer');
-            const max = Math.min(displayedCount + LOAD_BATCH, currentDisplayList.length);
-            
-            for(let i = displayedCount; i < max; i++) {
-                let track = currentDisplayList[i];
+            homePlaylist.forEach(track => {
                 let div = document.createElement('div');
                 div.className = 'song-item';
-                div.onclick = () => playSong(track); 
-                // 4-Bar Equalizer
+                div.onclick = () => playSong(track, 'home');
                 div.innerHTML = `
                     <div class="song-left">
-                        <span class="song-id">#${track.id}</span>
+                        <span class="song-id">#${track.id.substring(1)}</span>
                         <img src="${track.thumb}" class="song-thumb">
                         <div class="song-info">
                             <div class="song-title">${track.title}</div>
                             <div class="song-artist">${track.artist}</div>
                         </div>
                     </div>
-                    <div class="eq-icon">
-                        <div class="bar"></div><div class="bar"></div>
-                        <div class="bar"></div><div class="bar"></div>
-                    </div>
+                    <div class="eq-icon"><div class="bar"></div><div class="bar"></div><div class="bar"></div></div>
                 `;
                 container.appendChild(div);
-            }
-            displayedCount = max;
-            if(displayedCount >= currentDisplayList.length) document.getElementById('scrollLoader').style.display = 'none';
+            });
         }
 
-        window.addEventListener('scroll', () => {
-            if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 50) {
-                if(displayedCount < currentDisplayList.length) {
-                    document.getElementById('scrollLoader').style.display = 'block';
-                    setTimeout(loadMore, 300);
-                }
-            }
-        });
-
         // --- PLAYER ---
-        function playSong(track) {
-            currentIndex = fullPlaylist.findIndex(t => t.id === track.id);
+        function playSong(track, tab) {
+            if(tab === 'global') currentActiveList = globalPlaylist;
+            else if(tab === 'home') currentActiveList = homePlaylist;
+
+            currentIndex = currentActiveList.findIndex(t => t.id === track.id);
             document.getElementById('musicPlayer').classList.add('visible');
             document.getElementById('playerTitle').innerText = track.title;
             document.getElementById('playerArtist').innerText = track.artist;
             document.getElementById('playerThumb').src = track.thumb;
             
-            // Activate List Item
             document.querySelectorAll('.song-item').forEach(el => el.classList.remove('active'));
-            const allItems = document.querySelectorAll('.song-item');
-            for(let item of allItems) {
-                if(item.querySelector('.song-id').innerText === "#"+track.id) {
-                    item.classList.add('active');
-                    break;
-                }
-            }
+            // Highlight specific item logic can be added here if needed
             
             audio.src = track.link;
             audio.play();
@@ -401,8 +467,8 @@
             else { audio.pause(); document.getElementById('playIcon').innerText = "play_arrow"; document.getElementById('playerThumb').classList.remove('playing'); }
         }
 
-        function nextSong() { currentIndex < fullPlaylist.length - 1 ? playSong(fullPlaylist[currentIndex + 1]) : playSong(fullPlaylist[0]); }
-        function prevSong() { currentIndex > 0 ? playSong(fullPlaylist[currentIndex - 1]) : null; }
+        function nextSong() { currentIndex < currentActiveList.length - 1 ? playSong(currentActiveList[currentIndex + 1]) : playSong(currentActiveList[0]); }
+        function prevSong() { currentIndex > 0 ? playSong(currentActiveList[currentIndex - 1]) : null; }
 
         audio.ontimeupdate = () => { if(audio.duration) document.getElementById('progFill').style.width = (audio.currentTime / audio.duration) * 100 + "%"; };
         document.getElementById('progArea').onclick = (e) => { let w = e.currentTarget.clientWidth; audio.currentTime = (e.offsetX / w) * audio.duration; }
@@ -410,13 +476,23 @@
 
         document.getElementById('searchInput').addEventListener('keyup', (e) => {
             let term = e.target.value.toLowerCase();
-            document.getElementById('songContainer').innerHTML = '';
-            displayedCount = 0;
-            if(term.length > 0) currentDisplayList = fullPlaylist.filter(s => (s.title + s.artist + s.id).toLowerCase().includes(term));
-            else currentDisplayList = [...fullPlaylist];
+            let targetContainer = currentTab === 'global' ? document.getElementById('globalContainer') : document.getElementById('homeContainer');
+            let targetList = currentTab === 'global' ? globalPlaylist : homePlaylist;
             
-            if(currentDisplayList.length === 0) document.getElementById('noResult').style.display = 'block';
-            else { document.getElementById('noResult').style.display = 'none'; loadMore(); }
+            targetContainer.innerHTML = '';
+            
+            let filtered = targetList.filter(s => (s.title + s.artist).toLowerCase().includes(term));
+            if(filtered.length === 0) document.getElementById('noResult').style.display = 'block';
+            else {
+                document.getElementById('noResult').style.display = 'none';
+                filtered.forEach(track => {
+                    let div = document.createElement('div');
+                    div.className = 'song-item';
+                    div.onclick = () => playSong(track, currentTab);
+                    div.innerHTML = `<div class="song-left"><img src="${track.thumb}" class="song-thumb"><div class="song-info"><div class="song-title">${track.title}</div><div class="song-artist">${track.artist}</div></div></div>`;
+                    targetContainer.appendChild(div);
+                });
+            }
         });
 
         function parseCSV(text) {
