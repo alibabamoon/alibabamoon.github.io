@@ -162,11 +162,11 @@
             };
         </script>
         <script type="text/javascript" src="https://www.highperformanceformat.com/28342205/invoke.js"></script>
-        <span style="color:#555; font-size:10px;">Welcome to Alibaba Moon</span>
+        <span style="color:#555; font-size:10px;">ADVERTISEMENT</span>
     </div>
 
     <div id="homeView" class="view-section active">
-        <div class="section-title">Rendom Mix</div>
+        <div class="section-title">Happy New Year Mix</div>
         <div id="loadingHome" style="text-align:center; padding:30px; color:#666;">
             <i class="fas fa-spinner fa-spin" style="font-size:24px; margin-bottom:10px;"></i><br>Mixing Tracks...
         </div>
@@ -236,13 +236,13 @@
         const FORM_ACTION = "https://docs.google.com/forms/d/e/1FAIpQLSeHCakTTgx8R6p3zO-Kiv6o5vbj9YJ4vWFEsooYbWlEx9Bveg/formResponse";
         const ENTRY_IDS = { title: "entry.1127806446", audio: "entry.951478009", thumb: "entry.86259578", artist: "entry.1676226431" };
 
+        
         const ARCHIVE_LINKS = [
             "https://archive.org/details/KhwajaMereKhwaja_201604",
             "https://archive.org/details/munni-badnam-hui-full-song-dabangg-lyrical-video-salman-khan-malaika-arora-khan",
             "https://archive.org/details/ami-tomar-moner-vitor-habib-wahid-nancy-lyrical-video",
             "https://archive.org/details/atifaslamsongs"
-        ];"
-            
+        ];
 
         let globalPlaylist = [], homePlaylist = [], currentActiveList = [];
         let homeDisplayed = 0, globalDisplayed = 0;
@@ -272,6 +272,7 @@
                 document.getElementById('globalView').classList.add('active');
                 document.getElementById('btnGlobal').classList.add('active');
                 currentActiveList = globalPlaylist;
+                if(globalPlaylist.length === 0) loadGlobalMusic(); // Retry if empty
             } else {
                 document.getElementById('homeView').classList.add('active');
                 document.getElementById('btnHome').classList.add('active');
@@ -326,7 +327,6 @@
 
         async function loadHomeMusic() {
             homePlaylist = [];
-            
             try {
                 const res = await fetch(CSV_URL);
                 const text = await res.text();
@@ -348,33 +348,42 @@
 
             document.getElementById('loadingHome').style.display = 'none';
             if(currentTab === 'home') currentActiveList = homePlaylist;
-            
             homeDisplayed = 0;
-            loadMore('home'); // 🔥 LOADS ONLY 15 AT START 🔥
+            loadMore('home'); 
         }
 
         async function loadGlobalMusic() {
             globalPlaylist = [];
             let songCounter = 1;
+            
+            // 🔥 FIXED LOADING LOGIC 🔥
+            const loader = document.getElementById('loadingGlobal');
+            if(loader) loader.style.display = 'block';
 
             for (const link of ARCHIVE_LINKS) {
                 try {
+                    // Safe Check
+                    if(!link.includes('/details/')) continue;
                     let archiveId = link.split('/details/')[1].split('/')[0];
+                    
                     const metaUrl = `https://archive.org/metadata/${archiveId}`;
                     const res = await fetch(metaUrl);
+                    if(!res.ok) throw new Error("Metadata failed");
                     const data = await res.json();
                     
-                    if(data.files) {
+                    if(data.files && data.d1 && data.dir) {
                         let server = `https://${data.d1}${data.dir}/`;
                         let thumb = "https://via.placeholder.com/100/7F5AF0/ffffff?text=Global";
+                        
                         for(let f of data.files) {
                             if(f.format === "JPEG" || f.format === "PNG" || f.format === "Thumbnail") {
                                 thumb = server + f.name;
                                 break;
                             }
                         }
+
                         data.files.forEach(file => {
-                            if(file.format === "VBR MP3" || file.name.endsWith(".mp3")) {
+                            if(file.format === "VBR MP3" || (file.name && file.name.toLowerCase().endsWith(".mp3"))) {
                                 let title = file.title || file.name.replace(".mp3", "").replace(/_/g, " ");
                                 let link = server + file.name;
                                 let id = String(songCounter++).padStart(3, '0') + "G";
@@ -382,14 +391,15 @@
                             }
                         });
                     }
-                } catch(err) { console.log(err); }
+                } catch(err) { console.log("Skipping bad link: " + link); }
             }
 
-            globalPlaylist = shuffleArray(globalPlaylist);
-            document.getElementById('loadingGlobal').style.display = 'none';
+            // Always hide loader at the end
+            if(loader) loader.style.display = 'none';
             
+            globalPlaylist = shuffleArray(globalPlaylist);
             globalDisplayed = 0;
-            loadMore('global'); // 🔥 LOADS ONLY 15 AT START 🔥
+            loadMore('global'); 
         }
 
         function loadMore(tab) {
@@ -397,6 +407,12 @@
             let list = tab === 'home' ? homePlaylist : globalPlaylist;
             let count = tab === 'home' ? homeDisplayed : globalDisplayed;
             
+            // Check if empty
+            if(list.length === 0 && count === 0) {
+                container.innerHTML = '<div style="text-align:center; padding:20px; color:#666;">No songs found.</div>';
+                return;
+            }
+
             let max = Math.min(count + LOAD_BATCH, list.length);
             
             for(let i = count; i < max; i++) {
@@ -407,7 +423,6 @@
             if(tab === 'home') homeDisplayed = max;
             else globalDisplayed = max;
             
-            // Hide Loader if end reached
             if(max >= list.length) {
                 document.getElementById(tab + 'Loader').style.display = 'none';
             } else {
@@ -433,7 +448,6 @@
             return div;
         }
 
-        // --- SCROLL LOADER ---
         window.addEventListener('scroll', () => {
             if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 100) {
                 if(currentTab === 'home' && homeDisplayed < homePlaylist.length) {
@@ -520,6 +534,7 @@
             }
             if(row.length > 0) arr.push(row); return arr;
         }
-    </script>
+        </script>
+    
 </body>
 </html>
